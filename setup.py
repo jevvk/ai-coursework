@@ -10,7 +10,7 @@ setup(
     version='0.0.1',
     description='AI coursework',
     long_description=readme,
-    author='Emilian Simion, Eugen Patru, Razvan Lacatus',
+    author='Emilian Simion, Eugen Patru, Razvan Lacatusu',
     url='https://github.com/linoimi/ai-coursework',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
