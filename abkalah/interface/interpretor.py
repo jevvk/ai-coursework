@@ -2,7 +2,7 @@ class Interpretor:
   def __init__(self):
     pass
 
-  # return new board
+  # return move, board
   def receive(self, message):
     # start, change, end
     pass
