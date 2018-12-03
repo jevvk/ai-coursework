@@ -1,12 +1,3 @@
 class Game:
-  def start(self):
-    pass
-  
-  def swap(self):
-    pass
-  
-  def move(self, action):
-    pass
-
-  def end(self):
+  def __init__(self, interpretor):
     pass

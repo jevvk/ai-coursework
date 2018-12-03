@@ -1,13 +1,13 @@
 class Interpretor:
-  game = None
+  def __init__(self):
+    pass
 
-  def __init__(self, game):
-    self.game = game
-
+  # return new board
   def receive(self, message):
     # start, change, end
     pass
-  
-  def send(self, move):
+
+  # send move to stdout
+  def send(self, board, move):
     # move, swap
     pass
