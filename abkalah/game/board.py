@@ -6,11 +6,6 @@ class Board:
     self.state = board
 
   def move(self, move):
-    opponent = NORTH if move < 8 else SOUTH
-    player = NORTH if opponent == SOUTH else SOUTH
-
-    return Board(), opponent
-
     # receive a move
     # update the board in regards to the move
     # move the balls around
@@ -24,10 +19,10 @@ class Board:
     opponent = NORTH if move < 8 else SOUTH
     player = NORTH if opponent == SOUTH else SOUTH
 
-    beans = moved_board[move - 1]
-    current_well = move - 1
+    beans = moved_board[move]
+    current_well = move
 
-    moved_board[move - 1] = 0
+    moved_board[move] = 0
     current_well += 1
     player_side = player
 
