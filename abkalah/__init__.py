@@ -1,4 +1,5 @@
 from threading import Lock
 
-d_lock = Lock()
-tree_root = None
+ab_lock = Lock()
+ab_break = False
+best_move = None

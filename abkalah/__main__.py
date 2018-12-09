@@ -1,20 +1,16 @@
 import sys
 import select
 
-from abkalah.interface.interpretor import Interpretor
-from abkalah.game.game import Game
+from abkalah.agent import Agent
 
-interpretor = Interpretor()
-game = Game(interpretor)
+agent = Agent()
 
 while True:
   input = select.select([sys.stdin], [], [], 1)[0]
 
   if input:
     msg = sys.stdin.readline().rstrip()
-    move, board = interpretor.receive(msg)
 
-    game.update(move)
-    # game.check(board)
+    agent.receive(msg)
   else:
     continue
