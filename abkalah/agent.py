@@ -57,6 +57,8 @@ class Agent:
 
     else: # END
       self._wait_for_ab(0)
+
+      sys.exit(0)
   
   def _start_ab(self):
     self.ab = Thread(target=self.calculate)
@@ -89,11 +91,14 @@ class Agent:
     self.playing = next_player == self.side
 
   def calculate(self):
-    global best_move
+    global best_move, ab_break, ab_lock
 
-    # TODO
-    # best_move = alpha_beta(...).move
     ab_lock.acquire()
+
+    # depth = 5
+
+    # while not ab_break:
+    #   ab.search(self.board, depth, maximizing=self.playing)
 
     best_move = 1 if self.side == NORTH else 9
 
