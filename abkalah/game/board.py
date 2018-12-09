@@ -6,7 +6,6 @@ class Board:
     self.state = board
 
   def move(self, move):
-
     # receive a move
     # update the board in regards to the move
     # move the balls around
@@ -89,13 +88,13 @@ class Board:
     return sum
 
   def get_free_turns_for_player(player_num):
-      int count = 0
-      if player_num == 1:
-          for i in range(0,7):
-              if self.state[i] == (7-i):
-                  count += 1
-      else:
-          for i in range(8, 15):
-              if self.state[i] == (13-i):
-                  count += 1
-      return count
+    count = 0
+    if player_num == 1:
+      for i in range(0,7):
+          if self.state[i] == (7-i):
+              count += 1
+    else:
+      for i in range(8, 15):
+          if self.state[i] == (15-i):
+              count += 1
+    return count
