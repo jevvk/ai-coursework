@@ -1,12 +1,7 @@
 class Board:
-  def start(self):
-    pass
-  
-  def swap(self):
-    pass
-  
-  def move(self, action):
-    pass
+  def __init__(self, board = [7] * 7 + [0] + [7] * 7 + [0]):
+    self.board = board
 
-  def end(self):
-    pass
+  def move(self, move):
+    # TODO: razvan
+    return Board()
