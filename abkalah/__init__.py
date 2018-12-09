@@ -2,4 +2,4 @@ from threading import Lock
 
 ab_lock = Lock()
 ab_break = False
-best_move = None
+best_move = 0
