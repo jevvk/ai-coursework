@@ -1,5 +1,9 @@
 from abkalah import d_lock
 
+class Node:
+  def __init__(self):
+    pass
+
 class AlphaBeta:
   queue = []
 
