@@ -30,7 +30,7 @@ class Agent:
       ab_lock.release()
 
       if message[7:] == 'SWAP':
-        self.side = 2 if self.side == 1 else 1
+        self.side = NORTH if self.side == SOUTH else SOUTH
         self.playing = not self.playing
 
       # update board with opponent move
