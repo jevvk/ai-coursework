@@ -26,7 +26,7 @@ class Board:
     moved_board[move - 1] = 0
     current_well += 1
 
-    while True:
+    while beans > - 1:
       if (current_well == (8 * player) - 1) | (current_well == (8 * opponent) - 1):
       # Inside own kalaha
         if player_side == player:
@@ -58,7 +58,7 @@ class Board:
         # Turn ended
           if player_side == player and moved_board[current_well] == 1:
             # Ended in own, empty current well
-            opposite_well = 16 - current_well
+            opposite_well = 14 - current_well
             moved_board[(8 * player) - 1] += (moved_board[current_well] + moved_board[opposite_well])
             moved_board[current_well] = moved_board[opposite_well] = 0
           # Game ended - opponent wins?
