@@ -6,7 +6,6 @@ class Board:
     self.state = board
 
   def move(self, move):
-<<<<<<< Updated upstream
 
     # receive a move
     # update the board in regards to the move
@@ -79,11 +78,6 @@ class Board:
   def available_moves(self, player):
     pass
 
-
-=======
-    # TODO: razvan
-    return Board()
-
   def count_stones(player_num):
     sum = 0
     if player_num == 1:
@@ -105,10 +99,3 @@ class Board:
               if self.state[i] == (13-i):
                   count += 1
       return count
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
