@@ -14,7 +14,7 @@ class Board:
     # if not change player
 
     #inherit values from previous board
-    moved_board = [ i for i in self.board ]
+    moved_board = [ i for i in self.state ]
 
     opponent = NORTH if move < 8 else SOUTH
     player = NORTH if opponent == SOUTH else SOUTH
