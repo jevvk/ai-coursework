@@ -6,6 +6,11 @@ class Board:
     self.state = board
 
   def move(self, move):
+    opponent = NORTH if move < 8 else SOUTH
+    player = NORTH if opponent == SOUTH else SOUTH
+
+    return Board(), opponent
+
     # receive a move
     # update the board in regards to the move
     # move the balls around
@@ -77,7 +82,7 @@ class Board:
   def available_moves(self, player):
     pass
 
-  def count_stones(player_num):
+  def count_stones(self, player_num):
     sum = 0
     if player_num == 1:
         for i in range(0,7):
@@ -87,7 +92,7 @@ class Board:
             sum += self.state[i]
     return sum
 
-  def get_free_turns_for_player(player_num):
+  def get_free_turns_for_player(self, player_num):
     count = 0
     if player_num == 1:
       for i in range(0,7):
