@@ -43,9 +43,12 @@ class Agent:
       # break search and wait for result
       self._wait_for_ab(0)
 
-      if message[7:] == 'SWAP':
+      if message[7:11] == 'SWAP':
         self.side = NORTH if self.side == SOUTH else SOUTH
         self.playing = not self.playing
+
+        self._start_ab()
+        return
 
       # update board with opponent move
       op_side = NORTH if self.side == SOUTH else SOUTH
@@ -95,6 +98,6 @@ class Agent:
     # best_move = alpha_beta(...).move
     ab_lock.acquire()
 
-    best_move = 0
+    best_move = 9
 
     ab_lock.release()
