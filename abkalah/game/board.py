@@ -47,8 +47,10 @@ class Board:
                   moved_board[current_well] += moved_board[current_well + opp]
                   moved_board[current_well + opp] = 0
             return Board(moved_board), player
-
-        current_well += 1
+          current_well += 1
+        else :
+          current_well = 0;
+          
         player_side = NORTH if player_side == SOUTH else SOUTH
       else:
       # Inside wells
