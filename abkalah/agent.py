@@ -5,7 +5,6 @@ from threading import Thread
 
 from abkalah import ab_break, ab_lock, best_move, NORTH, SOUTH
 from abkalah.game.board import Board
-from abkalah.game.alphabeta import AlphaBeta
 
 class Agent:
   def __init__(self):
@@ -30,8 +29,10 @@ class Agent:
       self._wait_for_ab(0)
 
       if message[7:11] == 'SWAP':
-        self.side = NORTH if self.side == SOUTH else SOUTH
-        self.playing = not self.playing
+        self.side = NORTH
+        self.playing = True
+
+        while self.playing: self._play()
 
         self._start_ab()
       else:
@@ -40,7 +41,14 @@ class Agent:
         move = int(message[7])
         move = move if op_side == NORTH else 14 - move
 
-        self.board = self.board.move(move)
+        # update board while the opponent is playing
+        next_player = 0
+
+        while next_player != self.side:
+          self.board, next_player = self.board.move(move)
+
+        # play while 
+        self.playing = True
 
         while self.playing: self._play()
 
@@ -58,7 +66,7 @@ class Agent:
     global best_move, ab_break, ab_lock
 
     if seconds > 0:
-      time.sleep(seconds) # TODO
+      time.sleep(seconds)
 
     # break search and wait for result
     ab_break = True
@@ -68,7 +76,7 @@ class Agent:
   def _play(self):
     # interative depth search
     self._start_ab()
-    self._wait_for_ab(1)
+    self._wait_for_ab(1) # TODO
     
     next_move = best_move if self.side == NORTH else 14 - best_move
 
@@ -87,6 +95,6 @@ class Agent:
     # best_move = alpha_beta(...).move
     ab_lock.acquire()
 
-    best_move = 9
+    best_move = 1 if self.side == NORTH else 9
 
     ab_lock.release()
