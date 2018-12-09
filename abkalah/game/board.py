@@ -23,12 +23,8 @@ class Board:
     beans = moved_board[move - 1]
     current_well = move - 1
 
-    if beans == 0:
-      raise ValueError("Invalid move")
-
     moved_board[move - 1] = 0
     current_well += 1
-
 
     while True:
       if (current_well == (8 * player) - 1) | (current_well == (8 * opponent) - 1):
