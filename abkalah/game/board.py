@@ -105,4 +105,7 @@ class Board:
               if self.state[i] == (13-i):
                   count += 1
       return count
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
