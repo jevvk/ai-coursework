@@ -1,8 +1,9 @@
 import sys
 import time
+
 from threading import Thread
 
-from abkalah import ab_break, ab_lock, best_move
+from abkalah import ab_break, ab_lock, best_move, NORTH, SOUTH
 from abkalah.game.board import Board
 
 class Agent:
@@ -14,7 +15,7 @@ class Agent:
 
   def receive(self, message):
     if message[:5] == 'START':
-      self.side = 1 if message[6] == 'N' else 2
+      self.side = NORTH if message[6] == 'N' else SOUTH
       self.playing = self.side == 1
 
       # iterative depth search
@@ -33,8 +34,9 @@ class Agent:
         self.playing = not self.playing
 
       # update board with opponent move
-      op_side = (self.side + 1) % 2
-      move = int(message[7]) + (op_side - 1) * 8
+      op_side = NORTH if self.side == SOUTH else SOUTH
+      move = int(message[7])
+      move = move if op_side == NORTH else move + 8
 
       self.board = self.board.move(move)
 
@@ -55,9 +57,9 @@ class Agent:
       sys.stdout.flush()
 
       # update board with our move
-      best_move = best_move - (self.side - 1) * 8
+      next_move = best_move if self.side == NORTH else best_move + 8
 
-      self.board = self.board.move(best_move)
+      self.board = self.board.move(next_move)
 
       # interative depth search
       self.ab = Thread(target=self.calculate)
