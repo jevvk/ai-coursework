@@ -1,5 +1,8 @@
 import sys
-def eval(Board board):
+
+from abkalah.game.board import Board
+
+def evaluate(board):
     score = 0
     p1_stones = board.count_stones(1)
     p2_stones = board.count_stones(2)
@@ -49,17 +52,14 @@ def eval(Board board):
         score -= 1
 
     ratio = float(p1_stones) / float(p2_stones)
-    if ration > .72:
+    if ratio > .72:
         score -= mostOpponent * 2
 
-    inverseRation = float(p2_stones) / float(p1_stones)
+    inverseRatio = float(p2_stones) / float(p1_stones)
     if inverseRatio > .85:
         score -= mostOpponent / 2
 
     score += board.get_free_turns_for_player(1)
     score -= board.get_free_turns_for_player(2)
-
-    if player_num == 2:
-        score *= -1
 
     return score
