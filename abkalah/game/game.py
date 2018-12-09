@@ -51,7 +51,7 @@ class Game:
                 if self.board[current_well + opp] > 0:
                   self.board[current_well] += self.board[current_well + opp]
                   self.board[current_well + opp] = 0
-            return player
+            return board
 
         current_well += 1
         player_side = NORTH if player_side == SOUTH else SOUTH
@@ -77,7 +77,7 @@ class Game:
                 if self.board[opp] > 0:
                   self.board[(8 * opponent) - 1] += self.board[opp]
                   self.board[opp] = 0
-            return opponent
+            return board
         current_well += 1
 
 
