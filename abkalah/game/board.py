@@ -29,6 +29,7 @@ class Board:
 
     moved_board[move - 1] = 0
     current_well += 1
+    player_side = player
 
     while beans > - 1:
       if (current_well == (8 * player) - 1) | (current_well == (8 * opponent) - 1):
