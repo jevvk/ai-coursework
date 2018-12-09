@@ -32,8 +32,8 @@ class Game:
 
     while True:
       #(((WELLS + 1) * player) - 1)
-      if current_well == 7:
-        # Inside kalaha
+      if (current_well == (8 * player) - 1) | (current_well == (8 * opponent) - 1):
+        # Inside own kalaha
         if player_side == player:
           # Own kalaha - sow
           self.board[(WELLS * player) - 1] += 1
@@ -56,7 +56,7 @@ class Game:
         current_well += 1
         player_side = NORTH if player_side == SOUTH else SOUTH
       else:
-        # Inside my own wells
+        # Inside wells
         beans -= 1
         self.board[current_well] += 1
         if beans == 0:
@@ -64,7 +64,7 @@ class Game:
           if player_side == player and self.board[current_well] == 1:
             # Ended in own, empty current well
             opposite_well = 14 - current_well
-            self.board[7] += (self.board[current_well] + self.board[opposite_well])
+            self.board[(8 * player) - 1] += (self.board[current_well] + self.board[opposite_well])
             self.board[current_well] = self.board[opposite_well] = 0
           # Game ended - opponent wins?
             ending = 1
