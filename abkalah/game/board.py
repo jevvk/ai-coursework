@@ -18,7 +18,6 @@ class Board:
 
     opponent = NORTH if move < 8 else SOUTH
     player = NORTH if opponent == SOUTH else SOUTH
-
     beans = moved_board[move]
     current_well = move
 
@@ -27,7 +26,8 @@ class Board:
     player_side = player
 
     while beans > - 1:
-      if (current_well == (8 * player) - 1) | (current_well == (8 * opponent) - 1):
+      if (current_well == (8 * player) - 1)| (current_well == (8 * opponent) - 1):
+        player_side = NORTH if player_side == SOUTH else SOUTH
       # Inside own kalaha
         if player_side == player:
         # Own kalaha - sow
@@ -50,11 +50,10 @@ class Board:
           current_well += 1
         else:
           current_well = 0;
-          
-        player_side = NORTH if player_side == SOUTH else SOUTH
       else:
       # Inside wells
         beans -= 1
+
         moved_board[current_well] += 1
         if beans == 0:
         # Turn ended
