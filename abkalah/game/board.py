@@ -9,7 +9,7 @@ class Board:
     opponent = NORTH if move < 8 else SOUTH
     player = NORTH if opponent == SOUTH else SOUTH
 
-    return Board(), opponent
+    return Board(), player
 
     # receive a move
     # update the board in regards to the move
