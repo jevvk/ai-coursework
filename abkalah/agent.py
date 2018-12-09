@@ -14,20 +14,34 @@ class Agent:
     self.ab = None
 
   def receive(self, message):
+    global best_move, ab_break, ab_lock
+
     if message[:5] == 'START':
       self.side = NORTH if message[6] == 'N' else SOUTH
-      self.playing = self.side == 1
+      self.playing = self.side == SOUTH
 
-      # iterative depth search
-      self.ab = Thread(target=self.calculate)
-      self.ab.start()
+      # start search
+      self._start_ab()
+
+      if self.playing:
+        # break after 1 second
+        self._wait_for_ab(1)
+        
+        next_move = best_move if self.side == NORTH else best_move - 8
+
+        # send message to stdout
+        sys.stdout.write('MOVE;' + str(next_move) + '\n')
+        sys.stdout.flush()
+
+        # update board with our move
+        self.board = self.board.move(best_move)
+
+        # start search
+        self._start_ab()
+
     elif message[:6] == 'CHANGE':
-      global best_move, ab_break, ab_lock
-
       # break search and wait for result
-      ab_break = True
-      ab_lock.acquire()
-      ab_lock.release()
+      self._wait_for_ab(0)
 
       if message[7:] == 'SWAP':
         self.side = NORTH if self.side == SOUTH else SOUTH
@@ -41,34 +55,39 @@ class Agent:
       self.board = self.board.move(move)
 
       # interative depth search
-      self.ab = Thread(target=self.calculate)
-      self.ab.start()
-
-      # break after n ms
-      time.sleep(1) # TODO
-
-      # break search and wait for result
-      ab_break = True
-      ab_lock.acquire()
-      ab_lock.release()
+      self._start_ab()
+      self._wait_for_ab(1)
       
+      next_move = best_move if self.side == NORTH else best_move - 8
+
       # send message to stdout
-      sys.stdout.write('MOVE;' + str(best_move) + '\n')
+      sys.stdout.write('MOVE;' + str(next_move) + '\n')
       sys.stdout.flush()
 
       # update board with our move
-      next_move = best_move if self.side == NORTH else best_move + 8
+      self.board = self.board.move(best_move)
 
-      self.board = self.board.move(next_move)
+      # start search
+      self._start_ab()
 
-      # interative depth search
-      self.ab = Thread(target=self.calculate)
-      self.ab.start()
     else: # END
-      ab_break = True
-      ab_lock.acquire()
-      ab_lock.release()
+      self._wait_for_ab(0)
   
+  def _start_ab(self):
+    self.ab = Thread(target=self.calculate)
+    self.ab.start()
+
+  def _wait_for_ab(self, seconds):
+    global best_move, ab_break, ab_lock
+
+    if seconds > 0:
+      time.sleep(seconds) # TODO
+
+    # break search and wait for result
+    ab_break = True
+    ab_lock.acquire()
+    ab_lock.release()
+
   def calculate(self):
     global best_move
 
