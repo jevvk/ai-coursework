@@ -12,7 +12,7 @@ class AlphaBeta:
     self.side = side
     self.queue = []
 
-  def search(self, board, depth, maximising, alpha = float('-inf'), beta = float('inf'), first=False):
+  def search(self, board, depth, maximising, alpha = float('-inf'), beta = float('inf'), first_turn = False, first=False):
     global mem
 
     node = Node()
@@ -35,7 +35,7 @@ class AlphaBeta:
       for move in moves:
         if mem['ab_break']: break
         
-        new_board, new_player = board.move(move)
+        new_board, new_player = board.move(move, first_turn=first_turn)
         value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
 
         # if first: print('trying', new_board.state, node.value)
@@ -55,13 +55,14 @@ class AlphaBeta:
 
       if self.terminal_test(board, moves):
         node.value = evaluate(board, self.side)
+        return node
 
       node.value = float('inf')
 
       for move in moves:        
         if mem['ab_break']: break
         
-        new_board, new_player = board.move(move)
+        new_board, new_player = board.move(move, first_turn=first_turn)
         value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
 
         # if first: print('trying', new_board.state, node.value)
