@@ -1,5 +1,10 @@
-init:
-  pip install -r requirements.txt
+agent: clean
+	mkdir -p build
+	zip -r build/agent.zip abkalah/
+	(cd abkalah && zip ../build/agent.zip __main__.py)
 
-test:
+clean:
+	rm -rf build
+
+test: agent
 	java -jar game/ManKalah.jar "python -m azkalah/" "java -jar game/MKRefAgent.jar"
