@@ -51,7 +51,8 @@ def evaluate(board, player):
         score -= 1
 
     ratio = float(p1_stones) / float(p2_stones)
-    if ratio > .72:
+
+    if ratio < .72:
         score -= mostOpponent * 2
 
     inverseRatio = float(p2_stones) / float(p1_stones)
