@@ -12,10 +12,12 @@ class AlphaBeta:
     self.side = side
     self.queue = []
 
-  def search(self, board, depth, maximising, alpha = float('-inf'), beta = float('inf'), first_turn = False, first=False):
+  def search(self, board, depth, maximising, alpha = float('-inf'), beta = float('inf'), first_turn = False):
     global mem
 
     node = Node()
+
+    # TODO: sometimes it doesn't find a move, not sure why
 
     if depth == 0:
       node.value = evaluate(board, self.side)
@@ -24,6 +26,7 @@ class AlphaBeta:
     if maximising:
       player = self.side
       moves = board.available_moves(player)
+
       # TODO: order moves by previous valuation (transposition table)
 
       if self.terminal_test(board, moves):
@@ -38,10 +41,7 @@ class AlphaBeta:
         new_board, new_player = board.move(move, first_turn=first_turn)
         value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
 
-        # if first: print('trying', new_board.state, node.value)
-
         if (node.value < value):
-          # if first: print('maxmising', new_board.state, 'new', value, move)
           node.value = value
           node.move = move
 
@@ -51,6 +51,7 @@ class AlphaBeta:
     else:
       player = NORTH if self.side == SOUTH else SOUTH
       moves = board.available_moves(player)
+
       # TODO: order moves by previous valuation (transposition table)
 
       if self.terminal_test(board, moves):
@@ -65,18 +66,13 @@ class AlphaBeta:
         new_board, new_player = board.move(move, first_turn=first_turn)
         value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
 
-        # if first: print('trying', new_board.state, node.value)
-
         if (node.value > value):
-          # if first: print('minimising', new_board.state, 'new', value, move)
           node.value = value
           node.move = move
 
         beta = min(beta, node.value)
 
         if beta <= alpha: break
-
-    # if first: print('first', node.value, node.move)
 
     return node
 

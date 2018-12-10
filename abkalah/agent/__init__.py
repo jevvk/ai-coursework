@@ -8,11 +8,13 @@ from abkalah.game.board import Board
 from abkalah.game.alphabeta import AlphaBeta
 
 class Agent:
+
   def __init__(self):
     self.board = Board()
     self.side = -1
     self.playing = False
     self.ab = None
+    self.first_turn = True
 
   def receive(self, message):
     if message[:5] == 'START':
@@ -33,15 +35,18 @@ class Agent:
 
       else:
         # get move
+        opponent = NORTH if self.side == SOUTH else SOUTH
+        side = self.side if self.playing else opponent
         move = int(message[7]) - 1
-        move = move if self.playing else 8 + move
-        
+        move = move if side == NORTH else 8 + move
+
         # update board with opponent move
-        self.board, _ = self.board.move(move)
-        # print(self.board.__str__())
+        self.board, _ = self.board.move(move, first_turn=self.first_turn)
 
         # update player flag
         self.playing = message[-3:] == 'YOU'
+
+      self.first_turn = False
 
       if self.playing:
         # break search and wait for result
@@ -53,11 +58,10 @@ class Agent:
 
     else: # END
       self._wait_for_ab(0)
-
       sys.exit(0)
   
   def _start_ab(self):
-    self.ab = AgentThread(self.board, self.side, self.playing)
+    self.ab = AgentThread(self.board, self.side, self.playing, self.first_turn)
     self.ab.start()
 
   def _wait_for_ab(self, seconds):
@@ -91,19 +95,15 @@ class Agent:
     # send message to stdout
     sys.stdout.write('MOVE;' + str(next_move + 1) + '\n')
     sys.stdout.flush()
-    # print('MOVE;' + str(next_move + 1), file=log)
-
-    # update board with our move
-    # self, next_player = self.board.move(best_move)
-    # self.playing = next_player == self.side
 
 class AgentThread(Thread):
-  def __init__(self, board, side, playing):
+  def __init__(self, board, side, playing, first_turn):
     Thread.__init__(self)
 
     self.board = board
     self.side = side
     self.playing = playing
+    self.first_turn = first_turn
 
   def run(self):
     global mem
@@ -113,19 +113,15 @@ class AgentThread(Thread):
     ab = AlphaBeta(self.side)
     depth = 5
     mem['ab_break'] = False
+    mem['best_move'] = -1
 
-    while not mem['ab_break']:
-      next_move = ab.search(self.board, depth, self.playing, first=True).move
+    while not mem['ab_break'] and depth < 40:
+      next_move = ab.search(self.board, depth, self.playing, first_turn=self.first_turn).move
       # best_move = best_move if next_move != -1 else next_move
 
-      if not mem['ab_break']:
+      if not mem['ab_break'] and next_move != -1:
         mem['best_move'] = next_move
 
-      # print('depth', depth, 'best_move', mem['best_move'])
       depth += 1
-
-    # temporary
-    # next_move = ab.search(self.board, 9, self.playing, first=True).move
-    # mem['best_move'] = next_move
 
     mem['ab_lock'].release()
