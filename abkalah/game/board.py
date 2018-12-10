@@ -77,26 +77,50 @@ class Board:
         current_well += 1
 
   def available_moves(self, player):
-    pass
+    moves = []
 
-  def count_stones(self, player_num):
-    sum = 0
-    if player_num == 1:
-        for i in range(0,7):
-            sum += self.state[i]
-    else:
-        for i in range(8, 15):
-            sum += self.state[i]
-    return sum
-
-  def get_free_turns_for_player(self, player_num):
-    count = 0
-    if player_num == 1:
+    if player == NORTH:
       for i in range(0,7):
-          if self.state[i] == (7-i):
-              count += 1
+        if self.state[i] < 0:
+          moves.append(i)
     else:
       for i in range(8, 15):
-          if self.state[i] == (15-i):
-              count += 1
+        if self.state[i] < 0:
+          moves.append(i)
+
+    return moves
+  
+  def is_end(self):
+    for i in range(0, 7):
+      if self.state[i] > 0: return False
+
+    for i in range(8, 15):
+      if self.state[i] > 0: return False
+
+    return True
+
+  def count_stones(self, player):
+    sum = 0
+
+    if player == NORTH:
+      for i in range(0,7):
+        sum += self.state[i]
+    else:
+      for i in range(8, 15):
+        sum += self.state[i]
+
+    return sum
+
+  def get_free_turns_for_player(self, player):
+    count = 0
+
+    if player == NORTH:
+      for i in range(0,7):
+        if self.state[i] == (7-i):
+          count += 1
+    else:
+      for i in range(8, 15):
+        if self.state[i] == (15-i):
+          count += 1
+
     return count
