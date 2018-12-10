@@ -52,16 +52,16 @@ def evaluate(board, player):
     if (ai_most - ai_min) > 10:
         score -= 1
 
-    ratio = float(p1_stones + 1) / float(p2_stones + 1)
+    ratio = float(p1_stones) / float(p2_stones)
     if ratio > .72:
         score -= mostOpponent * 2
 
-    inverseRatio = float(p2_stones + 1) / float(p1_stones + 1)
+    inverseRatio = float(p2_stones) / float(p1_stones)
     if inverseRatio > .85:
         score -= mostOpponent / 2
 
-    score += board.get_free_turns_for_player(1)
-    score -= board.get_free_turns_for_player(2)
+    score += board.get_free_turns_for_player(NORTH)
+    score -= board.get_free_turns_for_player(SOUTH)
 
     if player == SOUTH:
         score *= -1
