@@ -4,10 +4,10 @@ class Board:
   def __init__(self, board = [7] * 7 + [0] + [7] * 7 + [0]):
     self.state = board
 
-  def move(self, move):
+  def move(self, move, first_turn = False):
     moved_board = [ i for i in self.state ]
 
-    player = NORTH if move < 8 else SOUTH
+    player = NORTH if move < 7 else SOUTH
     opponent = NORTH if player == SOUTH else SOUTH
 
     next_player = opponent
@@ -30,13 +30,13 @@ class Board:
   
     # check if the previous bowl was empty and capture opponent's
     if moved_board[move] == 1:
-      if player == NORTH and move < 7:
         opposite_well = 14 - move
+
+      if player == NORTH and move < 7 and moved_board[opposite_well] > 0:
         moved_board[7] += moved_board[opposite_well] + 1
         moved_board[opposite_well] = 0
         moved_board[move] = 0
-      elif player == SOUTH and move > 7:
-        opposite_well = 14 - move
+      elif player == SOUTH and move > 7 and move != 15 and moved_board[opposite_well] > 0:
         moved_board[15] += moved_board[opposite_well] + 1
         moved_board[opposite_well] = 0
         moved_board[move] = 0
@@ -53,7 +53,7 @@ class Board:
           moved_board[i] = 0
     
     # check if stone was placed inside the player's own well
-    if (player == NORTH and move == 7) or (player == SOUTH and move == 15):
+    if not first_turn and ((player == NORTH and move == 7) or (player == SOUTH and move == 15)):
       next_player = player
     
     return Board(moved_board), next_player
@@ -97,10 +97,10 @@ class Board:
     sum = 0
 
     if player == NORTH:
-      for i in range(0, 7):
+      for i in range(0, 8):
         sum += self.state[i]
     else:
-      for i in range(8, 15):
+      for i in range(8, 16):
         sum += self.state[i]
 
     return sum
