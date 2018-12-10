@@ -5,6 +5,7 @@ from threading import Thread
 
 from abkalah import ab_break, ab_lock, best_move, NORTH, SOUTH
 from abkalah.game.board import Board
+from abkalah.game.alphabeta import AlphaBeta
 
 class Agent:
   def __init__(self):
@@ -29,8 +30,10 @@ class Agent:
       self._wait_for_ab(0)
 
       if message[7:11] == 'SWAP':
-        self.side = NORTH
+        self.side = NORTH if self.side == SOUTH else SOUTH
         self.playing = True
+
+        # also reset transition table here
 
         while self.playing: self._play()
 
@@ -41,14 +44,9 @@ class Agent:
         move = int(message[7])
         move = move if op_side == NORTH else 14 - move
 
-        # update board while the opponent is playing
-        next_player = 0
-
-        while next_player != self.side:
-          self.board, next_player = self.board.move(move)
-
-        # play while 
-        self.playing = True
+        # update board with opponent move
+        self.board, next_player = self.board.move(move)
+        self.playing = self.side == next_player
 
         while self.playing: self._play()
 
@@ -61,7 +59,7 @@ class Agent:
       sys.exit(0)
   
   def _start_ab(self):
-    self.ab = Thread(target=self.calculate)
+    self.ab = AgentThread(self.board, self.side, self.playing)
     self.ab.start()
 
   def _wait_for_ab(self, seconds):
@@ -72,6 +70,9 @@ class Agent:
 
     # break search and wait for result
     ab_break = True
+
+    self.ab.join()
+
     ab_lock.acquire()
     ab_lock.release()
   
@@ -90,16 +91,25 @@ class Agent:
     self.board, next_player = self.board.move(best_move)
     self.playing = next_player == self.side
 
-  def calculate(self):
+class AgentThread(Thread):
+  def __init__(self, board, side, playing):
+    Thread.__init__(self)
+
+    self.board = board
+    self.side = side
+    self.playing = playing
+
+  def run(self):
     global best_move, ab_break, ab_lock
 
     ab_lock.acquire()
 
-    # depth = 5
+    ab = AlphaBeta(self.side)
+    depth = 5
+    ab_break = False
 
-    # while not ab_break:
-    #   ab.search(self.board, depth, maximizing=self.playing)
-
-    best_move = 1 if self.side == NORTH else 9
+    while not ab_break:
+      best_move = ab.search(self.board, depth, self.playing).move
+      depth += 1
 
     ab_lock.release()

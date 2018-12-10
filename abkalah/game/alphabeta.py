@@ -1,24 +1,28 @@
-from abkalah import d_lock
+from abkalah import ab_break, ab_lock, NORTH, SOUTH
+
+from abkalah.agent.evaluate import evaluate
 
 class Node:
   def __init__(self):
-    pass
+    self.value = 0
+    self.move = 0
 
 class AlphaBeta:
-  queue = []
+  def __init__(self, side):
+    self.side = side
+    self.queue = []
 
-  def __init__(self):
-    pass
+  def search(self, board, depth, maximising, alpha = float('-inf'), beta = float('inf')):
+    node = Node()
 
-  def search(self):
-    while len(self.queue) > 0:
-      d_lock.acquire()
+    if depth == 0:
+      node.value = evaluate(board)
+      return node
+    
+    if self.side == SOUTH:
+      node.move = 10
+    else:
+      node.move = 5
 
-      node = self.queue.pop()
+    return node
 
-      # TODO
-      
-      for child in node.children:
-        self.queue.append(child)
-
-      d_lock.release()
