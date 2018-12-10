@@ -16,8 +16,8 @@ def evaluate(board):
 
     countEmpty = 0
     mostOpponent = 0
-    ai_min = sys.maxint
-    ai_most = -sys.maxint - 1
+    ai_min = 9999999 # TODO
+    ai_most = -9999999 # TODO
     for i in range(0,7):
         oppositeIndex = 14 - i
         if board.state[i] < ai_min:
@@ -33,7 +33,7 @@ def evaluate(board):
                     if ((board.state[j] - (i-j)) % 15) == 0:
                         canSteal = 1
                 if canSteal:
-                    score += state[oppositeIndex]
+                    score += board.state[oppositeIndex]
             countEmpty+=1
 
         if board.state[oppositeIndex] > mostOpponent:
