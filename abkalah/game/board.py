@@ -38,7 +38,7 @@ class Board:
         moved_board[move] = 0
       elif player == SOUTH and move > 7:
         opposite_well = 14 - move
-        moved_board[7] += moved_board[opposite_well] + 1
+        moved_board[15] += moved_board[opposite_well] + 1
         moved_board[opposite_well] = 0
         moved_board[move] = 0
     
