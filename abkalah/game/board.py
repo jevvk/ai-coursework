@@ -6,75 +6,58 @@ class Board:
     self.state = board
 
   def move(self, move):
-    # receive a move
-    # update the board in regards to the move
-    # move the balls around
-    # check where the last one is
-    # if it is on our side, keep the same player
-    # if not change player
-
-    #inherit values from previous board
     moved_board = [ i for i in self.state ]
 
-    opponent = NORTH if move < 8 else SOUTH
-    player = NORTH if opponent == SOUTH else SOUTH
-    beans = moved_board[move]
-    current_well = move
+    player = NORTH if move < 8 else SOUTH
+    opponent = NORTH if player == SOUTH else SOUTH
 
+    next_player = opponent
+
+    stones = moved_board[move]
     moved_board[move] = 0
-    current_well += 1
-    player_side = player
 
-    while beans > - 1:
-      if (current_well == (8 * player) - 1)| (current_well == (8 * opponent) - 1):
-        player_side = NORTH if player_side == SOUTH else SOUTH
-      # Inside own kalaha
-        if player_side == player:
-        # Own kalaha - sow
-          moved_board[current_well] += 1
-          beans -= 1
-          if beans == 0:
-          # Turn ended inside own kalaha => new turn for player
-          # or victory if no more moves left
-            ending = 1
-            for position in range(1, WELLS):
-              if moved_board[current_well - position] > 0:
-                ending = 0
+    while stones > 0:
+      # update next move
+      move = (move + 1) % 16
 
-            if ending == 1:
-              for opp in range(1, WELLS):
-                if moved_board[current_well + opp] > 0:
-                  moved_board[current_well] += moved_board[current_well + opp]
-                  moved_board[current_well + opp] = 0
-            return Board(moved_board), player
-          current_well += 1
-        else:
-          current_well = 0;
+      # don't add to opponent's well
+      if player == NORTH and move == 15:
+        move = 0
+      elif player == SOUTH and move == 7:
+        move = 8
+      
+      moved_board[move] += 1
+      stones -= 1
+
+    # check if the previous bowl was empty and capture opponent's
+    if moved_board[move] == 1:
+      if player == NORTH and move < 7:
+        opposite_well = 14 - move
+        moved_board[7] += moved_board[opposite_well] + 1
+        moved_board[opposite_well] = 0
+        moved_board[move] = 0
+      elif player == SOUTH and move > 7:
+        opposite_well = 14 - move
+        moved_board[7] += moved_board[opposite_well] + 1
+        moved_board[opposite_well] = 0
+        moved_board[move] = 0
+    
+    # game end check
+    if not self.has_moves(player):
+      if player == NORTH:
+        for i in range(8, 15):
+          moved_board[15] += moved_board[i]
+          moved_board[i] = 0
       else:
-      # Inside wells
-        beans -= 1
+        for i in range(0, 7):
+          moved_board[7] += moved_board[i]
+          moved_board[i] = 0
 
-        moved_board[current_well] += 1
-        if beans == 0:
-        # Turn ended
-          if player_side == player and moved_board[current_well] == 1:
-            # Ended in own, empty current well
-            opposite_well = 14 - current_well
-            moved_board[(8 * player) - 1] += (moved_board[current_well] + moved_board[opposite_well])
-            moved_board[current_well] = moved_board[opposite_well] = 0
-          # Game ended - opponent wins?
-            ending = 1
-            for position in range(1, WELLS):
-              if moved_board[((8 * player) - 1) - position] > 0:
-                ending = 0
+    # check if stone was placed inside the player's own well
+    if (player == NORTH and move == 7) or (player == SOUTH and move == 15):
+      next_player = player
 
-            if ending == 1:
-              for opp in range(0, (WELLS - 1)):
-                if moved_board[opp] > 0:
-                  moved_board[(8 * opponent) - 1] += moved_board[opp]
-                  moved_board[opp] = 0
-            return Board(moved_board), opponent
-        current_well += 1
+    return Board(moved_board), next_player
 
   def has_moves(self, player):
     if player == NORTH:
