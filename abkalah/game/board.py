@@ -76,16 +76,28 @@ class Board:
             return Board(moved_board), opponent
         current_well += 1
 
+  def has_moves(self, player):
+    if player == NORTH:
+      for i in range(0,7):
+        if self.state[i] > 0:
+          return True
+    else:
+      for i in range(8, 15):
+        if self.state[i] > 0:
+          return True
+
+    return False
+
   def available_moves(self, player):
     moves = []
 
     if player == NORTH:
       for i in range(0,7):
-        if self.state[i] < 0:
+        if self.state[i] > 0:
           moves.append(i)
     else:
       for i in range(8, 15):
-        if self.state[i] < 0:
+        if self.state[i] > 0:
           moves.append(i)
 
     return moves
