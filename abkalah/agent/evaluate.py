@@ -1,11 +1,12 @@
 import sys
 
+from abkalah import NORTH, SOUTH
 from abkalah.game.board import Board
 
-def evaluate(board):
+def evaluate(board, player):
     score = 0
-    p1_stones = board.count_stones(1)
-    p2_stones = board.count_stones(2)
+    p1_stones = board.count_stones(NORTH)
+    p2_stones = board.count_stones(SOUTH)
 
     score = (board.state[7] - board.state[15]) + (p1_stones - p2_stones)
 
@@ -51,15 +52,18 @@ def evaluate(board):
     if (ai_most - ai_min) > 10:
         score -= 1
 
-    ratio = float(p1_stones) / float(p2_stones)
+    ratio = float(p1_stones + 1) / float(p2_stones + 1)
     if ratio > .72:
         score -= mostOpponent * 2
 
-    inverseRatio = float(p2_stones) / float(p1_stones)
+    inverseRatio = float(p2_stones + 1) / float(p1_stones + 1)
     if inverseRatio > .85:
         score -= mostOpponent / 2
 
     score += board.get_free_turns_for_player(1)
     score -= board.get_free_turns_for_player(2)
+
+    if player == SOUTH:
+        score *= -1
 
     return score

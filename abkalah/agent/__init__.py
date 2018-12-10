@@ -3,7 +3,7 @@ import time
 
 from threading import Thread
 
-from abkalah import ab_break, ab_lock, best_move, NORTH, SOUTH
+from abkalah import mem, NORTH, SOUTH
 from abkalah.game.board import Board
 from abkalah.game.alphabeta import AlphaBeta
 
@@ -15,40 +15,38 @@ class Agent:
     self.ab = None
 
   def receive(self, message):
-    global best_move, ab_break, ab_lock
-
     if message[:5] == 'START':
       self.side = NORTH if message[6] == 'N' else SOUTH
       self.playing = self.side == SOUTH
 
-      while self.playing: self._play()
+      if self.playing: self._play()
 
       self._start_ab()
+      # sys.exit(0)
 
     elif message[:6] == 'CHANGE':
-      # break search and wait for result
-      self._wait_for_ab(0)
-
       if message[7:11] == 'SWAP':
         self.side = NORTH if self.side == SOUTH else SOUTH
-        self.playing = True
+        self.playing = self.side == NORTH # only south can swap
 
         # also reset transition table here
 
-        while self.playing: self._play()
-
-        self._start_ab()
       else:
+        # get move
+        move = int(message[7]) - 1
+        move = move if self.playing else 8 + move
+        
         # update board with opponent move
-        op_side = NORTH if self.side == SOUTH else SOUTH
-        move = int(message[7])
-        move = move if op_side == NORTH else 14 - move
+        self.board, _ = self.board.move(move)
+        # print(self.board.__str__())
 
-        # update board with opponent move
-        self.board, next_player = self.board.move(move)
-        self.playing = self.side == next_player
+        # update player flag
+        self.playing = message[-3:] == 'YOU'
 
-        while self.playing: self._play()
+      if self.playing:
+        # break search and wait for result
+        self._wait_for_ab(0)
+        self._play()
 
         # start search
         self._start_ab()
@@ -63,33 +61,41 @@ class Agent:
     self.ab.start()
 
   def _wait_for_ab(self, seconds):
-    global best_move, ab_break, ab_lock
+    global mem
+
+    if self.ab is None:
+      return
 
     if seconds > 0:
       time.sleep(seconds)
 
     # break search and wait for result
-    ab_break = True
+    mem['ab_break'] = True
+
+    mem['ab_lock'].acquire()
+    mem['ab_lock'].release()
 
     self.ab.join()
-
-    ab_lock.acquire()
-    ab_lock.release()
+    self.ab = None
   
   def _play(self):
+    global mem
+
     # interative depth search
     self._start_ab()
-    self._wait_for_ab(1) # TODO
+    self._wait_for_ab(2) # TODO
     
-    next_move = best_move if self.side == NORTH else 14 - best_move
+    best_move = mem['best_move']
+    next_move = best_move if self.side == NORTH else best_move - 8
 
     # send message to stdout
-    sys.stdout.write('MOVE;' + str(next_move) + '\n')
+    sys.stdout.write('MOVE;' + str(next_move + 1) + '\n')
     sys.stdout.flush()
+    # print('MOVE;' + str(next_move + 1), file=log)
 
     # update board with our move
-    self.board, next_player = self.board.move(best_move)
-    self.playing = next_player == self.side
+    # self, next_player = self.board.move(best_move)
+    # self.playing = next_player == self.side
 
 class AgentThread(Thread):
   def __init__(self, board, side, playing):
@@ -100,16 +106,26 @@ class AgentThread(Thread):
     self.playing = playing
 
   def run(self):
-    global best_move, ab_break, ab_lock
+    global mem
 
-    ab_lock.acquire()
+    mem['ab_lock'].acquire()
 
     ab = AlphaBeta(self.side)
     depth = 5
-    ab_break = False
+    mem['ab_break'] = False
 
-    while not ab_break:
-      best_move = ab.search(self.board, depth, self.playing).move
+    while not mem['ab_break']:
+      next_move = ab.search(self.board, depth, self.playing, first=True).move
+      # best_move = best_move if next_move != -1 else next_move
+
+      if not mem['ab_break']:
+        mem['best_move'] = next_move
+
+      # print('depth', depth, 'best_move', mem['best_move'])
       depth += 1
 
-    ab_lock.release()
+    # temporary
+    # next_move = ab.search(self.board, 9, self.playing, first=True).move
+    # mem['best_move'] = next_move
+
+    mem['ab_lock'].release()

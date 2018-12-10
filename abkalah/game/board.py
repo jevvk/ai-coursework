@@ -1,4 +1,3 @@
-WELLS = 7
 from abkalah import NORTH, SOUTH
 
 class Board:
@@ -28,7 +27,7 @@ class Board:
       
       moved_board[move] += 1
       stones -= 1
-
+  
     # check if the previous bowl was empty and capture opponent's
     if moved_board[move] == 1:
       if player == NORTH and move < 7:
@@ -52,11 +51,11 @@ class Board:
         for i in range(0, 7):
           moved_board[7] += moved_board[i]
           moved_board[i] = 0
-
+    
     # check if stone was placed inside the player's own well
     if (player == NORTH and move == 7) or (player == SOUTH and move == 15):
       next_player = player
-
+    
     return Board(moved_board), next_player
 
   def has_moves(self, player):
@@ -98,7 +97,7 @@ class Board:
     sum = 0
 
     if player == NORTH:
-      for i in range(0,7):
+      for i in range(0, 7):
         sum += self.state[i]
     else:
       for i in range(8, 15):
@@ -110,12 +109,12 @@ class Board:
     count = 0
 
     if player == NORTH:
-      for i in range(0,7):
-        if self.state[i] == (7-i):
+      for i in range(0, 7):
+        if self.state[i] == (7 - i):
           count += 1
     else:
       for i in range(8, 15):
-        if self.state[i] == (15-i):
+        if self.state[i] == (15 - i):
           count += 1
 
     return count
