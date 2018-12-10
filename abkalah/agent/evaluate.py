@@ -11,11 +11,10 @@ def evaluate(board, player):
     score = (board.state[7] - board.state[15]) + (p1_stones - p2_stones)
 
     if board.state[7] > 49:
-        score += 1000
+        score += 10000
     elif board.state[15] > 49:
-        score -= 1000
+        score -= 10000
 
-    countEmpty = 0
     mostOpponent = 0
     ai_min = 9999999 # TODO
     ai_most = -9999999 # TODO
@@ -30,19 +29,18 @@ def evaluate(board, player):
         if board.state[i] == 0:
             if board.state[oppositeIndex] > 0:
                 canSteal = 0
-                for j in range(0,7):
+                for j in range(0, 7):
                     if ((board.state[j] - (i-j)) % 15) == 0:
                         canSteal = 1
                 if canSteal:
                     score += board.state[oppositeIndex]
-            countEmpty+=1
 
         if board.state[oppositeIndex] > mostOpponent:
             mostOpponent = board.state[oppositeIndex]
 
         if board.state[oppositeIndex] == 0:
             canOpponentSteal = 0
-            if board.state[oppositeIndex] > 6: # WTF is this for?
+            if board.state[i] > 0:
                 for j in range (8, 15):
                     if (board.state[j] - (i-j)) % 15 == 0:
                         canOpponentSteal = 1
