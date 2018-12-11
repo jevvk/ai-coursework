@@ -15,6 +15,19 @@ class Board:
     stones = moved_board[move]
     moved_board[move] = 0
 
+    # game end check
+    if not self.has_moves(player):
+      if player == NORTH:
+        for i in range(8, 15):
+          moved_board[15] += moved_board[i]
+          moved_board[i] = 0
+      else:
+        for i in range(0, 7):
+          moved_board[7] += moved_board[i]
+          moved_board[i] = 0
+      
+      return Board(moved_board), opponent
+
     while stones > 0:
       # update next move
       move = (move + 1) % 16
@@ -30,7 +43,7 @@ class Board:
   
     # check if the previous bowl was empty and capture opponent's
     if moved_board[move] == 1:
-        opposite_well = 14 - move
+      opposite_well = 14 - move
 
       if player == NORTH and move < 7 and moved_board[opposite_well] > 0:
         moved_board[7] += moved_board[opposite_well] + 1
@@ -40,18 +53,7 @@ class Board:
         moved_board[15] += moved_board[opposite_well] + 1
         moved_board[opposite_well] = 0
         moved_board[move] = 0
-    
-    # game end check
-    if not self.has_moves(player):
-      if player == NORTH:
-        for i in range(8, 15):
-          moved_board[15] += moved_board[i]
-          moved_board[i] = 0
-      else:
-        for i in range(0, 7):
-          moved_board[7] += moved_board[i]
-          moved_board[i] = 0
-    
+
     # check if stone was placed inside the player's own well
     if not first_turn and ((player == NORTH and move == 7) or (player == SOUTH and move == 15)):
       next_player = player
@@ -84,12 +86,14 @@ class Board:
 
     return moves
   
-  def is_end(self):
-    for i in range(0, 7):
-      if self.state[i] > 0: return False
+  def is_end(self, player):
+    if player == NORTH:
+      for i in range(0, 7):
+        if self.state[i] > 0: return False
 
-    for i in range(8, 15):
-      if self.state[i] > 0: return False
+    else:
+      for i in range(8, 15):
+        if self.state[i] > 0: return False
 
     return True
 
@@ -118,3 +122,6 @@ class Board:
           count += 1
 
     return count
+  
+  def __str__(self):
+    return [ self.state[0:7], self.state[7], self.state[8:15], self.state[15] ]

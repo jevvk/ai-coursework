@@ -1,5 +1,6 @@
-from abkalah import mem, NORTH, SOUTH
+from random import shuffle
 
+from abkalah import mem, NORTH, SOUTH
 from abkalah.agent.evaluate import evaluate
 
 class Node:
@@ -18,7 +19,6 @@ class AlphaBeta:
     node = Node()
 
     # TODO: sometimes it doesn't find a move, not sure why
-
     if depth == 0:
       node.value = evaluate(board, self.side)
       return node
@@ -28,18 +28,20 @@ class AlphaBeta:
       moves = board.available_moves(player)
 
       # TODO: order moves by previous valuation (transposition table)
-
-      if self.terminal_test(board, moves):
-        node.value = evaluate(board, self.side)
-        return node
       
+      moves = sorted(moves, key = (lambda x, p = self.side, b = board: evaluate(b.move(x)[0], p)))
       node.value = float('-inf')
 
       for move in moves:
         if mem['ab_break']: break
         
         new_board, new_player = board.move(move, first_turn=first_turn)
-        value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
+        value = 0
+
+        if new_board.is_end(new_player):
+          value = evaluate(board, self.side)
+        else:
+          value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
 
         if (node.value < value):
           node.value = value
@@ -54,17 +56,19 @@ class AlphaBeta:
 
       # TODO: order moves by previous valuation (transposition table)
 
-      if self.terminal_test(board, moves):
-        node.value = evaluate(board, self.side)
-        return node
-
+      moves = sorted(moves, key = (lambda x, p = self.side, b = board: -evaluate(b.move(x)[0], p)))
       node.value = float('inf')
 
       for move in moves:        
         if mem['ab_break']: break
         
         new_board, new_player = board.move(move, first_turn=first_turn)
-        value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
+        value = 0
+
+        if new_board.is_end(new_player):
+          value = evaluate(board, self.side)
+        else:
+          value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
 
         if (node.value > value):
           node.value = value
@@ -75,13 +79,4 @@ class AlphaBeta:
         if beta <= alpha: break
 
     return node
-
-  def terminal_test(self, board, moves):
-    for move in moves:
-      new_board, _ = board.move(move)
-
-      if new_board.is_end():
-        return True
-
-    return False
 
