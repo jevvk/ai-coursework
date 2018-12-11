@@ -15,11 +15,13 @@ class Agent:
     self.playing = False
     self.ab = None
     self.first_turn = True
+    self.can_swap = False
 
   def receive(self, message):
     if message[:5] == 'START':
       self.side = NORTH if message[6] == 'N' else SOUTH
       self.playing = self.side == SOUTH
+      self.can_swap = not self.playing
 
       if self.playing: self._play()
 
@@ -49,6 +51,13 @@ class Agent:
       self.first_turn = False
 
       if self.playing:
+        if self.can_swap:
+          # always swap
+          sys.stdout.write('SWAP\n')
+          sys.stdout.flush()
+
+          self.can_swap = False
+        else:
         # break search and wait for result
         self._wait_for_ab(0)
         self._play()
