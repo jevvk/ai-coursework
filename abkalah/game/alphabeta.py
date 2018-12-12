@@ -26,10 +26,8 @@ class AlphaBeta:
     if maximising:
       player = self.side
       moves = board.available_moves(player)
-
-      # TODO: order moves by previous valuation (transposition table)
-      
       moves = sorted(moves, key = (lambda x: table.get(board.move(x)[0], self.side)))
+      
       node.value = float('-inf')
 
       for move in moves:
@@ -44,7 +42,6 @@ class AlphaBeta:
           value = table.get(new_board, self.side)
           # value = evaluate(new_board, self.side)
 
-
         if (node.value < value):
           node.value = value
           node.move = move
@@ -58,10 +55,8 @@ class AlphaBeta:
     else:
       player = NORTH if self.side == SOUTH else SOUTH
       moves = board.available_moves(player)
-
-      # TODO: order moves by previous valuation (transposition table)
-
       moves = sorted(moves, key = (lambda x: table.get(board.move(x)[0], self.side)))
+
       node.value = float('inf')
 
       for move in moves:        
