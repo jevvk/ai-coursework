@@ -141,11 +141,8 @@ class AgentThread(Thread):
     mem['ab_table'].clean(self.board.state[7], self.board.state[15])
 
     while not mem['ab_break'] and depth < 15:
-      next_move = ab.search(self.board, depth, self.playing, first_turn=self.first_turn,  ).move
+      next_move = ab.search(self.board, depth, self.playing, first_turn=self.first_turn).move
       
-      # if next_move != -1:
-      #   mem['best_move'] = next_move
-
       if (not mem['ab_break'] or mem['best_move'] == -1) and next_move != -1:
         mem['best_move'] = next_move
 
