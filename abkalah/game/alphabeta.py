@@ -26,7 +26,7 @@ class AlphaBeta:
     if maximising:
       player = self.side
       moves = board.available_moves(player)
-      moves = sorted(moves, key = (lambda x: table.get(board.move(x)[0], self.side)))
+      moves = sorted(moves, reverse = True, key = (lambda x: table.get(board.move(x)[0], self.side)))
       
       node.value = float('-inf')
 
