@@ -2,28 +2,33 @@ from abkalah.agent.evaluate import evaluate
 
 class TTable:
   def __init__(self):
-    self.table = []
+    self.table = {}
 
-  def get(self, player, board):
-    hash = self._hash(board, player)
+  def get(self, board, player):
+    key = tuple(board.state)
 
-    if (board, player) not in self.table:
-      self.table[hash] = evaluate(board, player)
+    if key not in self.table:
+      self.table[key] = (board.state, evaluate(board, player))
 
-    return self.table[hash]
+    return self.table[key][1]
   
-  def put(self, player, board, value):
-    self.table[self._hash(board, player)] = value
+  def put(self, board, player, value):
+    key = tuple(board.state, player)
 
-  # TODO: given p1 and p2 stones, remove all evaluations which
-  # have less stones since they can't be reached anymore
+    if key not in self.table:
+      self.table[key] = (board.state, evaluate(board, player))
+    else:
+      self.table[key] = (board.state, value)
+    
+    return value
+
   def clean(self, p1_stones, p2_stones):
-    pass
+    print('before clean', len(self.table), flush=True)
+    self.table = dict(filter(lambda n: n[0][7] >= p1_stones and n[0][15] >= p2_stones, self.table.items()))
+    print('after clean', len(self.table), flush=True)
 
   # TODO: remove all evaluations
   def reset(self):
-    pass
+    self.table = {}
 
-  # TODO
-  def _hash(self, player, board):
     return 0
