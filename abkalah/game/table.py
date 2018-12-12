@@ -25,7 +25,6 @@ class TTable:
   def clean(self, p1_stones, p2_stones):
     self.table = dict(filter(lambda n: n[0][7] >= p1_stones and n[0][15] >= p2_stones, self.table.items()))
 
-  # TODO: remove all evaluations
   def reset(self):
     self.table = {}
 
