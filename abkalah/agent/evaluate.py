@@ -48,7 +48,7 @@ def evaluate(board, player):
 
       if board.state[i] > 0:
           for j in range (8, 15):
-            if (board.state[j] - (i-j)) % 15 == 0 and oppositeIndex != j:
+            if (board.state[j] - (oppositeIndex-j)) % 15 == 0 and oppositeIndex != j:
               canOpponentSteal = 1
 
           if canOpponentSteal:
