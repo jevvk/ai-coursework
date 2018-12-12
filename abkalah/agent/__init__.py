@@ -58,12 +58,12 @@ class Agent:
 
           self.can_swap = False
         else:
-        # break search and wait for result
-        self._wait_for_ab(0)
-        self._play()
+          # break search and wait for result
+          self._wait_for_ab(0)
+          self._play()
 
-        # start search
-        self._start_ab()
+          # start search
+          self._start_ab()
 
     else: # END
       self._wait_for_ab(0)
