@@ -38,10 +38,11 @@ class AlphaBeta:
         new_board, new_player = board.move(move, first_turn=first_turn)
         value = 0
 
-        if new_board.is_end(new_player):
-          value = evaluate(board, self.side)
+        if new_board.has_moves(new_player):
+          value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta, second=first).value
         else:
-          value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
+          value = evaluate(board, self.side)
+
 
         if (node.value < value):
           node.value = value
@@ -65,10 +66,11 @@ class AlphaBeta:
         new_board, new_player = board.move(move, first_turn=first_turn)
         value = 0
 
-        if new_board.is_end(new_player):
-          value = evaluate(board, self.side)
+        if new_board.has_moves(new_player):
+          value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta, second=first).value
         else:
-          value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta).value
+          value = evaluate(board, self.side)
+
 
         if (node.value > value):
           node.value = value
