@@ -13,14 +13,14 @@ class AlphaBeta:
     self.side = side
     self.queue = []
 
-  def search(self, board, depth, maximising, alpha = float('-inf'), beta = float('inf'), first_turn = False):
+  def search(self, board, depth, maximising, alpha = float('-inf'), beta = float('inf'), first_turn = False, first = False, second = False):
     global mem
 
+    table = mem['ab_table']
     node = Node()
 
-    # TODO: sometimes it doesn't find a move, not sure why
     if depth == 0:
-      node.value = evaluate(board, self.side)
+      node.value = table.get(board, self.side)
       return node
     
     if maximising:
@@ -29,7 +29,7 @@ class AlphaBeta:
 
       # TODO: order moves by previous valuation (transposition table)
       
-      moves = sorted(moves, key = (lambda x, p = self.side, b = board: evaluate(b.move(x)[0], p)))
+      moves = sorted(moves, key = (lambda x: table.get(board.move(x)[0], self.side)))
       node.value = float('-inf')
 
       for move in moves:
@@ -41,12 +41,16 @@ class AlphaBeta:
         if new_board.has_moves(new_player):
           value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta, second=first).value
         else:
-          value = evaluate(board, self.side)
+          value = table.get(new_board, self.side)
+          # value = evaluate(new_board, self.side)
 
 
         if (node.value < value):
           node.value = value
           node.move = move
+
+          # update transposition table
+          table.put(board, self.side, value)
 
         alpha = max(alpha, node.value)
 
@@ -57,7 +61,7 @@ class AlphaBeta:
 
       # TODO: order moves by previous valuation (transposition table)
 
-      moves = sorted(moves, key = (lambda x, p = self.side, b = board: -evaluate(b.move(x)[0], p)))
+      moves = sorted(moves, key = (lambda x: table.get(board.move(x)[0], self.side)))
       node.value = float('inf')
 
       for move in moves:        
@@ -69,12 +73,15 @@ class AlphaBeta:
         if new_board.has_moves(new_player):
           value = self.search(new_board, depth - 1, new_player == self.side, alpha, beta, second=first).value
         else:
-          value = evaluate(board, self.side)
-
+          value = table.get(new_board, self.side)
+          # value = evaluate(new_board, self.side)
 
         if (node.value > value):
           node.value = value
           node.move = move
+
+          # update transposition table
+          table.put(board, self.side, value)
 
         beta = min(beta, node.value)
 

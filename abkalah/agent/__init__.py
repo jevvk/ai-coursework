@@ -6,9 +6,9 @@ from threading import Thread
 from abkalah import mem, NORTH, SOUTH
 from abkalah.game.board import Board
 from abkalah.game.alphabeta import AlphaBeta
+from abkalah.game.table import TTable
 
 class Agent:
-
   def __init__(self):
     self.board = Board()
     self.side = -1
@@ -16,6 +16,8 @@ class Agent:
     self.ab = None
     self.first_turn = True
     self.can_swap = False
+
+    mem['ab_table'] = TTable()
 
   def receive(self, message):
     if message[:5] == 'START':
@@ -35,9 +37,9 @@ class Agent:
         self.playing = True
 
         # reset transition table here
-        # self._wait_for_ab(0)
-        # mem['ab_table'].reset()
-        # self._start_ab()
+        self._wait_for_ab(0)
+        mem['ab_table'].reset()
+        self._start_ab()
 
       else:
         # get move
@@ -65,7 +67,7 @@ class Agent:
 
           # restart program to update the side
           self._wait_for_ab(0)
-          # mem['ab_table'].reset()
+          mem['ab_table'].reset()
           self._start_ab()
 
           self.can_swap = False
@@ -108,7 +110,7 @@ class Agent:
 
     # interative depth search
     self._start_ab()
-    self._wait_for_ab(2) # TODO
+    self._wait_for_ab(3) # TODO
     
     best_move = mem['best_move']
     next_move = best_move if self.side == NORTH else best_move - 8
@@ -133,11 +135,13 @@ class AgentThread(Thread):
 
     ab = AlphaBeta(self.side)
     depth = 5
+
     mem['ab_break'] = False
     mem['best_move'] = -1
+    mem['ab_table'].clean(self.board.state[7], self.board.state[15])
 
     while not mem['ab_break'] and depth < 15:
-      next_move = ab.search(self.board, depth, self.playing, first_turn=self.first_turn).move
+      next_move = ab.search(self.board, depth, self.playing, first_turn=self.first_turn,  ).move
       
       # if next_move != -1:
       #   mem['best_move'] = next_move

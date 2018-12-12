@@ -124,4 +124,4 @@ class Board:
     return count
   
   def __str__(self):
-    return [ self.state[0:7], self.state[7], self.state[8:15], self.state[15] ]
+    return str([ self.state[0:7], self.state[7], self.state[8:15], self.state[15] ])

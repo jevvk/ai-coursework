@@ -13,7 +13,7 @@ class TTable:
     return self.table[key][1]
   
   def put(self, board, player, value):
-    key = tuple(board.state, player)
+    key = tuple(board.state)
 
     if key not in self.table:
       self.table[key] = (board.state, evaluate(board, player))
@@ -23,9 +23,7 @@ class TTable:
     return value
 
   def clean(self, p1_stones, p2_stones):
-    print('before clean', len(self.table), flush=True)
     self.table = dict(filter(lambda n: n[0][7] >= p1_stones and n[0][15] >= p2_stones, self.table.items()))
-    print('after clean', len(self.table), flush=True)
 
   # TODO: remove all evaluations
   def reset(self):

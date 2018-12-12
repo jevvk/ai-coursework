@@ -3,24 +3,33 @@ import sys
 from abkalah import NORTH, SOUTH
 from abkalah.game.board import Board
 
+WIN = 10000
+SURE_SEEDS = 5
+POSSIBLE_SEEDS = 2.5
+CAN_STEAL_SEEDS = 4
+OPP_CAN_STEAL_SEEDS = 4
+SPREAD_SEEDS = 1.5
+SPREAD_SEEDS_THRESHOLD = 7
+FREE_TURNS = 4
+
 def evaluate(board, player):
   score = 0
 
   p1_stones = board.count_stones(NORTH)
   p2_stones = board.count_stones(SOUTH)
 
-  score = (board.state[7] - board.state[15]) * 5 + (p1_stones - p2_stones) * 1.5
+  score = (board.state[7] - board.state[15]) * SURE_SEEDS + (p1_stones - p2_stones) * POSSIBLE_SEEDS
 
   if board.state[7] > 49:
-    score += 10000
+    score += WIN
   elif board.state[15] > 49:
-    score -= 10000
+    score -= WIN
 
   mostOpponent = 0
   ai_min = 98
   ai_most = 0
 
-  for i in range(0,7):
+  for i in range(0, 7):
     oppositeIndex = 14 - i
 
     if board.state[i] < ai_min:
@@ -33,29 +42,29 @@ def evaluate(board, player):
       mostOpponent = board.state[oppositeIndex]
 
     if board.state[i] == 0:
-      canSteal = 0
+      canSteal = False
 
       if board.state[oppositeIndex] > 0:
         for j in range(0, 7):
-          if ((board.state[j] - (i-j)) % 15) == 0 and i != j:
-            canSteal = 1
+          if i != j and ((board.state[j] - (i-j)) % 15) == 0:
+            canSteal = True
 
         if canSteal:
-            score += board.state[oppositeIndex] * 1.75
+          score += board.state[oppositeIndex] * CAN_STEAL_SEEDS
 
     if board.state[oppositeIndex] == 0:
-      canOpponentSteal = 0
+      canOpponentSteal = False
 
       if board.state[i] > 0:
           for j in range (8, 15):
-            if (board.state[j] - (oppositeIndex-j)) % 15 == 0 and oppositeIndex != j:
-              canOpponentSteal = 1
+            if oppositeIndex != j and (board.state[j] - (oppositeIndex-j)) % 15 == 0:
+              canOpponentSteal = True
 
           if canOpponentSteal:
-              score -= board.state[i] * 1.75
+            score -= board.state[i] * OPP_CAN_STEAL_SEEDS
 
-  if (ai_most - ai_min) > 7:
-    score -= ai_most
+  if (ai_most - ai_min) > SPREAD_SEEDS_THRESHOLD:
+    score -= ai_most * SPREAD_SEEDS
 
   ratio = float(p1_stones) / float(p2_stones)
 
@@ -67,8 +76,8 @@ def evaluate(board, player):
   if inverseRatio > .85:
     score -= mostOpponent / 2
 
-  score += board.get_free_turns_for_player(NORTH) * 3
-  score -= board.get_free_turns_for_player(SOUTH) * 3
+  score += board.get_free_turns_for_player(NORTH) * FREE_TURNS
+  score -= board.get_free_turns_for_player(SOUTH) * FREE_TURNS
 
   if player == SOUTH:
     score *= -1
