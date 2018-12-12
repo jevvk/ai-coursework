@@ -30,14 +30,14 @@ class Agent:
 
     elif message[:6] == 'CHANGE':
       if message[7:11] == 'SWAP':
-        self.side = NORTH if self.side == SOUTH else SOUTH
-        self.playing = self.side == NORTH # only south can swap
+        # we only get swap if the opponent did it
+        self.side = NORTH
+        self.playing = True
 
-        # also reset transition table here
-
-        # restart program to update the side
-        self._wait_for_ab(0)
-        self._start_ab()
+        # reset transition table here
+        # self._wait_for_ab(0)
+        # mem['ab_table'].reset()
+        # self._start_ab()
 
       else:
         # get move
@@ -59,6 +59,14 @@ class Agent:
           # always swap
           sys.stdout.write('SWAP\n')
           sys.stdout.flush()
+
+          self.side = SOUTH
+          self.playing = False
+
+          # restart program to update the side
+          self._wait_for_ab(0)
+          # mem['ab_table'].reset()
+          self._start_ab()
 
           self.can_swap = False
         else:
