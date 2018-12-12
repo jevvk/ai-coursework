@@ -4,82 +4,93 @@ from abkalah import NORTH, SOUTH
 from abkalah.game.board import Board
 
 WIN = 10000
-SURE_SEEDS = 5
-POSSIBLE_SEEDS = 1.25
-CAN_STEAL_SEEDS = 5
-OPP_CAN_STEAL_SEEDS = 5
-SPREAD_SEEDS = 1.25
-SPREAD_SEEDS_THRESHOLD = 7
-FREE_TURNS = 4
+SURE_SEEDS = 15
+POSSIBLE_SEEDS = 3.5
+CAN_STEAL_SEEDS = 10
+OPP_CAN_STEAL_SEEDS = 12
+SPREAD_SEEDS = 2.75
+SPREAD_SEEDS_THRESHOLD = 8
+FREE_TURNS = 6
+RATIO_THRESHOLD = 0.72
+RATIO_WEIGHT = 3
+INV_RATIO_THRESHOLD = 0.85
+INV_RATIO_WEIGHT = 3
 
 def evaluate(board, player):
   score = 0
 
-  p1_stones = board.count_stones(NORTH)
-  p2_stones = board.count_stones(SOUTH)
+  opponent = NORTH if player == SOUTH else SOUTH
 
-  score = (board.state[7] - board.state[15]) * SURE_SEEDS + (p1_stones - p2_stones) * POSSIBLE_SEEDS
+  player_stones = board.state[7] if player == NORTH else board.state[15]
+  player_total_stones = board.count_stones(player)
+  opp_stones = board.state[7] if opponent == NORTH else board.state[15]
+  opp_total_stones = board.count_stones(opponent)
 
-  if board.state[7] > 49:
-    score += WIN
-  elif board.state[15] > 49:
-    score -= WIN
+  if player_stones > 49:
+    score = WIN
+  elif opp_stones > 49:
+    score = -WIN
 
-  mostOpponent = 0
-  ai_min = 98
-  ai_most = 0
+  score += (player_stones - opp_stones) * SURE_SEEDS + (player_total_stones - opp_total_stones) * POSSIBLE_SEEDS
 
-  for i in range(0, 7):
-    oppositeIndex = 14 - i
+  score += board.get_free_turns_for_player(player) * FREE_TURNS
+  score -= board.get_free_turns_for_player(opponent) * FREE_TURNS
 
-    if board.state[i] < ai_min:
-      ai_min = board.state[i]
+  player_min = 98
+  player_most = 0
+  opp_most = 0
 
-    if board.state[i] > ai_most:
-      ai_most = board.state[i]
+  player_range = range(0, 7) if player == NORTH else range(8, 15)
+  opp_range = range(8, 15) if player == NORTH else range(0, 7)
 
-    if board.state[oppositeIndex] > mostOpponent:
-      mostOpponent = board.state[oppositeIndex]
+  for index in player_range:
+    opp_index = 14 - index
 
-    if board.state[i] == 0:
-      canSteal = False
+    if board.state[index] < player_min:
+      player_min = board.state[index]
 
-      if board.state[oppositeIndex] > 0:
-        for j in range(0, 7):
-          if i != j and ((board.state[j] - (i-j)) % 15) == 0:
-            canSteal = True
+    if board.state[index] > player_most:
+      player_most = board.state[index]
 
-        if canSteal:
-          score += board.state[oppositeIndex] * CAN_STEAL_SEEDS
+    if board.state[opp_index] > opp_most:
+      opp_most = board.state[index]
 
-    if board.state[oppositeIndex] == 0:
-      canOpponentSteal = False
+    # check what we can steal
+    if board.state[index] == 0:
+      can_steal = False
 
-      if board.state[i] > 0:
-          for j in range (8, 15):
-            if oppositeIndex != j and (board.state[j] - (oppositeIndex-j)) % 15 == 0:
-              canOpponentSteal = True
+      if board.state[opp_index] > 0:
+        for j in player_range:
+          if index != j and ((board.state[j] - (index-j)) % 15) == 0:
+            can_steal = True
 
-          if canOpponentSteal:
-            score -= board.state[i] * OPP_CAN_STEAL_SEEDS
+        if can_steal:
+          score += (board.state[opp_index] + 1) * CAN_STEAL_SEEDS
 
-  if (ai_most - ai_min) > SPREAD_SEEDS_THRESHOLD:
-    score -= ai_most * SPREAD_SEEDS
+    # check what opponent can steal
+    if board.state[opp_index] == 0:
+      can_steal = False
 
-  ratio = float(p1_stones) / float(p2_stones)
+      if board.state[index] > 0:
+        for j in opp_range:
+          if opp_index != j and (board.state[j] - (opp_index-j)) % 15 == 0:
+            can_steal = True
 
-  if ratio < .72:
-    score -= mostOpponent * 2
+        if can_steal:
+          score -= (board.state[index] + 1) * OPP_CAN_STEAL_SEEDS
 
-  inverseRatio = float(p2_stones) / float(p1_stones)
+  ratio = float(player_total_stones) / float(opp_total_stones)
 
-  if inverseRatio > .85:
-    score -= mostOpponent / 2
+  if ratio > RATIO_THRESHOLD:
+    score -= opp_most * RATIO_WEIGHT
 
-  score += board.get_free_turns_for_player(NORTH) * FREE_TURNS
-  score -= board.get_free_turns_for_player(SOUTH) * FREE_TURNS
+  inv_ratio = float(opp_total_stones) / float(player_total_stones)
 
-  if player == SOUTH:
-    score *= -1
+  if inv_ratio > INV_RATIO_THRESHOLD:
+    score -= opp_most * INV_RATIO_WEIGHT
+
+  # try not to have bowls that are too big
+  if (player_most - player_min) > SPREAD_SEEDS_THRESHOLD:
+    score -= player_most * SPREAD_SEEDS
 
   return score
