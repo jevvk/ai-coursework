@@ -35,6 +35,10 @@ class Agent:
 
         # also reset transition table here
 
+        # restart program to update the side
+        self._wait_for_ab(0)
+        self._start_ab()
+
       else:
         # get move
         opponent = NORTH if self.side == SOUTH else SOUTH
@@ -124,7 +128,7 @@ class AgentThread(Thread):
     mem['ab_break'] = False
     mem['best_move'] = -1
 
-    while not mem['ab_break'] and depth < 40:
+    while not mem['ab_break'] and depth < 15:
       next_move = ab.search(self.board, depth, self.playing, first_turn=self.first_turn).move
       
       # if next_move != -1:
