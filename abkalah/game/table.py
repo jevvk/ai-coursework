@@ -11,15 +11,11 @@ class TTable:
       self.table[key] = (board.state, evaluate(board, player))
 
     return self.table[key][1]
-  
+
   def put(self, board, player, value):
     key = tuple(board.state)
+    self.table[key] = (board.state, value)
 
-    if key not in self.table:
-      self.table[key] = (board.state, evaluate(board, player))
-    else:
-      self.table[key] = (board.state, value)
-    
     return value
 
   def clean(self, p1_stones, p2_stones):
