@@ -11,6 +11,7 @@ OPP_CAN_STEAL_SEEDS = 12
 SPREAD_SEEDS = 2.75
 SPREAD_SEEDS_THRESHOLD = 8
 FREE_TURNS = 6
+CLUSTERING_WEIGHT = 2.5
 RATIO_THRESHOLD = 0.72
 RATIO_WEIGHT = 3
 INV_RATIO_THRESHOLD = 0.85
@@ -31,20 +32,24 @@ def evaluate(board, player):
   elif opp_stones > 49:
     score = -WIN
 
+  # get stones difference
   score += (player_stones - opp_stones) * SURE_SEEDS + (player_total_stones - opp_total_stones) * POSSIBLE_SEEDS
 
+  # get free turns
   score += board.get_free_turns_for_player(player) * FREE_TURNS
   score -= board.get_free_turns_for_player(opponent) * FREE_TURNS
 
   player_min = 98
   player_most = 0
   opp_most = 0
+  clustering = 0
 
   player_range = range(0, 7) if player == NORTH else range(8, 15)
   opp_range = range(8, 15) if player == NORTH else range(0, 7)
 
   for index in player_range:
     opp_index = 14 - index
+    relative_index = index if player == NORTH else index - 8
 
     if board.state[index] < player_min:
       player_min = board.state[index]
@@ -79,7 +84,14 @@ def evaluate(board, player):
         if can_steal:
           score -= (board.state[index] + 1) * OPP_CAN_STEAL_SEEDS
 
-  ratio = float(player_total_stones) / float(opp_total_stones)
+    # cluster stones near our own well
+    # the min should give the propper
+    clustering += board.state[index] * relative_index
+
+    ratio = float(player_total_stones) / float(opp_total_stones)
+
+  # add clustering score
+  # score += clustering * CLUSTERING_WEIGHT
 
   if ratio > RATIO_THRESHOLD:
     score -= opp_most * RATIO_WEIGHT
