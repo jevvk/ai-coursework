@@ -7,6 +7,9 @@ from abkalah import mem, NORTH, SOUTH
 from abkalah.game.board import Board
 from abkalah.game.alphabeta import AlphaBeta
 from abkalah.game.table import TTable
+from abkalah.agent.timeplan import timeplan
+
+MAX_DEPTH = 20
 
 class Agent:
   def __init__(self):
@@ -16,8 +19,10 @@ class Agent:
     self.ab = None
     self.first_turn = True
     self.can_swap = False
+    self.step = 0
 
     mem['ab_table'] = TTable()
+    mem['ab_max_depth'] = MAX_DEPTH
 
   def receive(self, message):
     if message[:5] == 'START':
@@ -53,6 +58,7 @@ class Agent:
 
         # update player flag
         self.playing = message[-3:] == 'YOU'
+        self.step += 1
 
       self.first_turn = False
 
@@ -82,19 +88,26 @@ class Agent:
     else: # END
       self._wait_for_ab(0)
       sys.exit(0)
-  
+
   def _start_ab(self):
+    global mem
+
+    mem['ab_max_depth'] = MAX_DEPTH
+
     self.ab = AgentThread(self.board, self.side, self.playing, self.first_turn)
     self.ab.start()
 
-  def _wait_for_ab(self, seconds):
+  def _wait_for_ab(self, min_time, max_depth = -1):
     global mem
 
     if self.ab is None:
       return
 
-    if seconds > 0:
-      time.sleep(seconds)
+    if max_depth != -1:
+      mem['ab_max_depth'] = max_depth
+
+    if min_time > 0 and max_depth == -1:
+      time.sleep(min_time)
 
     # break search and wait for result
     mem['ab_break'] = True
@@ -104,14 +117,16 @@ class Agent:
 
     self.ab.join()
     self.ab = None
-  
+
   def _play(self):
     global mem
 
+    min_time, max_depth = timeplan(self.board, self.step, mem['ab_depth'])
+
     # interative depth search
     self._start_ab()
-    self._wait_for_ab(3) # TODO
-    
+    self._wait_for_ab(min_time, max_depth)
+
     best_move = mem['best_move']
     next_move = best_move if self.side == NORTH else best_move - 8
 
@@ -139,10 +154,12 @@ class AgentThread(Thread):
     mem['ab_break'] = False
     mem['best_move'] = -1
     mem['ab_table'].clean(self.board.state[7], self.board.state[15])
+    mem['ab_depth'] = 0
 
-    while not mem['ab_break'] and depth < 15:
+    while not mem['ab_break'] and depth < mem['ab_max_depth']:
       next_move = ab.search(self.board, depth, self.playing, first_turn=self.first_turn).move
-      
+      mem['ab_depth'] = depth
+
       if (not mem['ab_break'] or mem['best_move'] == -1) and next_move != -1:
         mem['best_move'] = next_move
 
