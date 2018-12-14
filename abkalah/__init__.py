@@ -6,7 +6,7 @@ mem = {
   'ab_break': False,
   'ab_table': None,
   'ab_depth': 0,
-  'ab_max_depth': 20,
+  'ab_max_depth': 0,
   'best_move': 0
 }
 
