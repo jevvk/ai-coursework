@@ -7,7 +7,7 @@ replace:
 	cp build/agent.zip build/base.zip
 
 clean:
-	rm build/agent.zip
+	rm -f build/agent.zip || true
 
 test-ref-1: agent
 	java -jar game/ManKalah.jar "python3 build/agent.zip" "java -jar game/MKRefAgent.jar"
