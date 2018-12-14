@@ -4,7 +4,7 @@ from abkalah.agent.evaluate import evaluate
 MIN_DEPTH = 7
 MAX_DEPTH = 12
 START_GAME_THRESHOLD = 8
-MID_GAME_THRESHOLD = 16
+MID_GAME_THRESHOLD = 26
 
 def timeplan(board, step, player, depth):
   # 8 - very quick 0.25s
@@ -31,7 +31,7 @@ def timeplan(board, step, player, depth):
   if step <= MID_GAME_THRESHOLD:
     return -1, 10
 
-  depth = MIN_DEPTH + ratio * 8
+  depth = MIN_DEPTH + ratio * 5
   # if we think we're winning, think for one less level
   depth = depth - 1 if evaluate(board, player) > 0 else depth
   # don't try to reach too deep
