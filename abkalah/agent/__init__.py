@@ -121,8 +121,8 @@ class Agent:
   def _play(self):
     global mem
 
-    min_time, max_depth = timeplan(self.board, self.step, mem['ab_depth'])
-
+    min_time, max_depth = timeplan(self.board, self.step, self.side, mem['ab_depth'])
+    
     # interative depth search
     self._start_ab()
     self._wait_for_ab(min_time, max_depth)
