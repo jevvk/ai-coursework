@@ -7,11 +7,11 @@ WIN = 10000
 SURE_SEEDS = 15
 POSSIBLE_SEEDS = 3.5
 CAN_STEAL_SEEDS = 10
-OPP_CAN_STEAL_SEEDS = 12
+OPP_CAN_STEAL_SEEDS = 15
 SPREAD_SEEDS = 2.75
 SPREAD_SEEDS_THRESHOLD = 8
 FREE_TURNS = 6
-CLUSTERING_WEIGHT = 2.5
+CLUSTERING_WEIGHT = 1.5
 RATIO_THRESHOLD = 0.72
 RATIO_WEIGHT = 3
 INV_RATIO_THRESHOLD = 0.85
@@ -33,7 +33,7 @@ def evaluate(board, player):
     score = -WIN
 
   # get stones difference
-  score += (player_stones - opp_stones) * SURE_SEEDS + (player_total_stones - opp_total_stones) * POSSIBLE_SEEDS
+  score += (player_stones - opp_stones) * SURE_SEEDS + (player_total_stones - player_stones - opp_total_stones + opp_stones) * POSSIBLE_SEEDS
 
   # get free turns
   score += board.get_free_turns_for_player(player) * FREE_TURNS
@@ -91,7 +91,7 @@ def evaluate(board, player):
     ratio = float(player_total_stones) / float(opp_total_stones)
 
   # add clustering score
-  # score += clustering * CLUSTERING_WEIGHT
+  score += clustering * CLUSTERING_WEIGHT
 
   if ratio > RATIO_THRESHOLD:
     score -= opp_most * RATIO_WEIGHT
