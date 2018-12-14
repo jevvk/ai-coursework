@@ -22,9 +22,10 @@ def timeplan(board, step, player, depth):
 
   ratio = (board.state[player_well] + board.state[opp_well]) / 98
 
-  # select moves with increasing time
+  # our evaluation function plays badly with high depth at the start
+  # so less depth is better for now
   if step <= START_GAME_THRESHOLD:
-    return 0.5 * step + 1, -1
+    return -1, 7
 
   # use fixed depth for more steps
   # this should bring us in a ok position
